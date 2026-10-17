@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LifeCare PDF Header &amp; Footer Generator | Diagnostic Centre</title>
+  <meta name="description" content="Generate high-resolution patient diagnostic reports with automated LifeCare Diagnostic Centre header and footer letterhead embedding using pdf-lib in browser.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/jpeg" href="header.jpeg">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-wrapper">
+        <img src="header.jpeg" alt="LifeCare Diagnostic Centre Logo" class="brand-logo-img" id="mainBrandLogo">
+        <div class="brand-info">
+          <div class="brand-title">
+            LIFE CARE
+            <span class="badge-lab">Diagnostic Centre</span>
+          </div>
+          <div class="brand-subtitle">Automated Multi-Page PDF Letterhead &amp; Report Studio</div>
+        </div>
+      </div>
+
+      <div class="header-badges">
+        <div class="status-chip" title="Header and footer letterhead assets active">
+          <span class="status-dot"></span>
+          <span>Letterhead Active</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="main-wrapper">
+    <div class="app-grid">
+
+      <!-- Left Column: Compact Upload Form -->
+      <section class="controls-column" aria-label="PDF Upload">
+        <div class="card compact-card" id="uploadCard">
+          <div class="card-title-row">
+            <h2 class="card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+              Upload Patient Report
+            </h2>
+          </div>
+
+          <!-- Drag and Drop Target -->
+          <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload PDF by clicking or dragging and dropping">
+            <input type="file" id="pdfFileInput" accept="application/pdf,.pdf" style="display: none;">
+            <div class="dropzone-icon-wrap">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+            </div>
+            <div class="dropzone-title">Drop PDF report here</div>
+            <div class="dropzone-desc">or <span class="browse-link">Browse file</span></div>
+            <button type="button" class="btn-sample" id="btnLoadSample" title="Load sample laboratory report to test instantly">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              Try Sample Report
+            </button>
+          </div>
+
+          <!-- Selected File Card (Hidden until file selected) -->
+          <div class="file-card hidden" id="fileCard">
+            <div class="file-card-details">
+              <div class="file-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+              </div>
+              <div class="file-texts">
+                <div class="file-name" id="fileNameDisplay">report.pdf</div>
+                <div class="file-meta">
+                  <span id="fileSizeDisplay">0 KB</span> • 
+                  <span id="filePagesDisplay">Detecting...</span>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="btn-remove-file" id="btnRemoveFile" title="Change or remove PDF file">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          <!-- ONLY Download PDF Button -->
+          <div class="action-buttons-group">
+            <button type="button" class="btn-success" id="btnDownloadPdf" disabled>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Download Branded PDF
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Live PDF Preview Panel -->
+      <section class="preview-column" aria-label="PDF Preview Panel">
+        <div class="card preview-card">
+          
+          <!-- Preview Toolbar -->
+          <div class="preview-toolbar">
+            <div class="preview-tabs">
+              <button type="button" class="preview-tab active" id="tabGenerated" data-target="generated">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                Branded PDF Preview
+              </button>
+              <button type="button" class="preview-tab" id="tabOriginal" data-target="original" disabled>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                Original PDF
+              </button>
+            </div>
+
+            <div class="preview-actions">
+              <span class="preview-badge-status" id="previewStatusBadge">No PDF Loaded</span>
+              <button type="button" class="btn-outline" id="btnFullscreen" title="Open in new window / full tab" disabled style="padding: 0.35rem 0.6rem; font-size: 0.75rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <polyline points="9 21 3 21 3 15"></polyline>
+                  <line x1="21" y1="3" x2="14" y2="10"></line>
+                  <line x1="3" y1="21" x2="10" y2="14"></line>
+                </svg>
+                Full Screen
+              </button>
+            </div>
+          </div>
+
+          <!-- Preview Frame / Empty State Area -->
+          <div class="preview-container" id="previewContainer">
+            
+            <!-- Empty State -->
+            <div class="preview-empty" id="previewEmptyState">
+              <div class="preview-empty-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+              </div>
+              <div class="preview-empty-title">Ready to Brand Your PDF</div>
+              <p class="preview-empty-desc">
+                Upload your laboratory report or medical document to automatically apply LifeCare Diagnostic Centre's official header and footer on every page.
+              </p>
+              <button type="button" class="btn-sample" id="btnEmptySample">
+                📄 Try Sample Lab Report Now
+              </button>
+            </div>
+
+            <!-- Loading Spinner Overlay -->
+            <div class="preview-loading hidden" id="previewLoading">
+              <div class="spinner"></div>
+              <div id="loadingText" style="font-weight: 600; font-size: 0.95rem;">Processing PDF with pdf-lib...</div>
+              <div style="font-size: 0.78rem; opacity: 0.8; margin-top: 0.25rem;">Preserving vector text, fonts, and page dimensions</div>
+            </div>
+
+            <!-- PDF Viewer Iframe -->
+            <iframe class="preview-iframe hidden" id="pdfPreviewIframe" title="PDF Preview Frame"></iframe>
+
+          </div>
+
+          <!-- Privacy Security Notice Banner -->
+          <div class="privacy-banner">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <div>
+              <strong>100% Client-Side Privacy:</strong> Patient records and medical documents are processed directly in browser memory. No data is ever transmitted to a server.
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- App Footer -->
+  <footer class="app-footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <span>LIFE CARE DIAGNOSTIC CENTRE</span>
+        <span>• # 1, 'B' Block, 5th Cross, Subhashnagar, Singasandra, Bengaluru - 68</span>
+      </div>
+      <div class="footer-contact">
+        <span>📞 Home Service: <strong>99025 30402 / 89047 07562</strong></span>
+        <span>✉️ lifecarelabgk2018@gmail.com</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts -->
+  <!-- 1. Offline & Local pdf-lib (Fallback to CDN if local isn't present) -->
+  <script src="pdf-lib.min.js"></script>
+  <script>
+    if (typeof PDFLib === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"><\/script>');
+    }
+  </script>
+
+  <!-- 2. Embedded Default Assets Data (Header, Footer, Sample Report) -->
+  <script src="assets-data.js"></script>
+
+  <!-- 3. Core Application Logic -->
+  <script src="app.js"></script>
+
+</body>
+</html>
