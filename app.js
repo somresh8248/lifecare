@@ -20,14 +20,14 @@
     headerDataUrl: null,
     headerBytes: null,
     headerFormat: 'jpeg',
-    headerWidth: 2880,
-    headerHeight: 544,
+    headerWidth: 720,
+    headerHeight: 165,
 
     footerDataUrl: null,
     footerBytes: null,
     footerFormat: 'jpeg',
-    footerWidth: 2880,
-    footerHeight: 207,
+    footerWidth: 720,
+    footerHeight: 61,
 
     activeTab: 'generated',
     isGenerating: false
@@ -122,6 +122,29 @@
    */
   async function initDefaultAssets() {
     try {
+      // 1. Try to fetch the local header.jpeg and footer.jpeg files first
+      try {
+        const [headerRes, footerRes] = await Promise.all([
+          fetch('header.jpeg?v=' + Date.now()),
+          fetch('footer.jpeg?v=' + Date.now())
+        ]);
+        if (headerRes.ok && footerRes.ok) {
+          const headerBuf = await headerRes.arrayBuffer();
+          const footerBuf = await footerRes.arrayBuffer();
+          state.headerBytes = new Uint8Array(headerBuf);
+          state.footerBytes = new Uint8Array(footerBuf);
+          state.headerFormat = 'jpeg';
+          state.footerFormat = 'jpeg';
+          state.headerWidth = 720;
+          state.headerHeight = 165;
+          state.footerWidth = 720;
+          state.footerHeight = 61;
+          return;
+        }
+      } catch (fetchErr) {
+        // Fallback to window.LIFECARE_DEFAULTS (e.g. when run via file:// protocol)
+      }
+
       if (window.LIFECARE_DEFAULTS) {
         state.headerDataUrl = window.LIFECARE_DEFAULTS.headerDataUrl;
         state.headerBytes = dataUrlToUint8Array(state.headerDataUrl);
@@ -134,15 +157,6 @@
         state.footerFormat = 'jpeg';
         state.footerWidth = window.LIFECARE_DEFAULTS.footerWidth;
         state.footerHeight = window.LIFECARE_DEFAULTS.footerHeight;
-      } else {
-        const [headerRes, footerRes] = await Promise.all([
-          fetch('header.jpeg'),
-          fetch('footer.jpeg')
-        ]);
-        const headerBuf = await headerRes.arrayBuffer();
-        const footerBuf = await footerRes.arrayBuffer();
-        state.headerBytes = new Uint8Array(headerBuf);
-        state.footerBytes = new Uint8Array(footerBuf);
       }
     } catch (err) {
       console.warn('Asset initialization warning:', err);
@@ -257,7 +271,7 @@
       // Load original PDF document (preserves vector text, fonts, forms, and pages)
       const pdfDoc = await PDFLib.PDFDocument.load(state.uploadedPdfBytes, { ignoreEncryption: true });
 
-      // Embed Header Image (4x UHD 2880px)
+      // Embed Header Image (Exact authentic letterhead)
       let headerImage;
       if (state.headerFormat === 'png') {
         headerImage = await pdfDoc.embedPng(state.headerBytes);
@@ -265,7 +279,7 @@
         headerImage = await pdfDoc.embedJpg(state.headerBytes);
       }
 
-      // Embed Footer Image (4x UHD 2880px)
+      // Embed Footer Image (Exact authentic letterhead)
       let footerImage;
       if (state.footerFormat === 'png') {
         footerImage = await pdfDoc.embedPng(state.footerBytes);
